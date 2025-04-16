@@ -6,7 +6,7 @@
 #   $ python3 scaffold.py
 #
 # This script generates a basic Python project structure
-# Supports Flask or CLI apps
+# Supports Flask, Django, FastAPI, CLI apps, or multiplatform (tkinter)
 # Optional libs: requests, SQLAlchemy
 # Generates .env, README.md, .gitignore, requirements.txt
 # Auto-inits git and makes first commit
@@ -15,7 +15,7 @@ import os
 import subprocess
 import sys
 
-PROJECT_OPTIONS = ["flask", "cli"]
+PROJECT_OPTIONS = ["flask", "django", "fastapi", "cli", "multiplatform"]
 OPTIONAL_LIBS = ["requests", "sqlalchemy"]
 
 
@@ -66,6 +66,8 @@ def create_requirements(path, app_type, libs):
         reqs.append("flask")
     if app_type == "django":
         reqs.append("django")
+    if app_type == "fastapi":
+        reqs.append("fastapi")
     reqs.extend(libs)
     write_file(os.path.join(path, "requirements.txt"), "\n".join(reqs) + "\n")
 
@@ -73,6 +75,10 @@ def create_requirements(path, app_type, libs):
 def create_main_file(path, app_type):
     if app_type == "flask":
         content = ("""from flask import Flask\n\napp = Flask(__name__)\n\n@app.route('/')\ndef hello():\n    return 'Hello from Flask!'\n\nif __name__ == '__main__':\n    app.run(debug=True)\n""")
+    elif app_type == "django":
+        content = ("""# Django app setup code goes here\n""")
+    elif app_type == "fastapi":
+        content = ("""from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/")\ndef read_root():\n    return {"Hello": "World"}\n\nif __name__ == "__main__":\n    import uvicorn\n    uvicorn.run(app, host="0.0.0.0", port=8000)\n""")
     else:
         content = ("""def main():\n    print('Hello from CLI app!')\n\nif __name__ == '__main__':\n    main()\n""")
     write_file(os.path.join(path, "main.py"), content)
@@ -104,7 +110,7 @@ def create_venv(path):
 def main():
     print("=== Python Project Scaffold ===")
     name = ask("Project name")
-    app_type = ask("App type (flask or cli)", PROJECT_OPTIONS)
+    app_type = ask("App type (flask, django, fastapi, cli, or multiplatform)", PROJECT_OPTIONS)
     libs = []
 
     print("Select optional libraries (press enter to skip):")
